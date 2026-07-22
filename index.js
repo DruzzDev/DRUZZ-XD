@@ -112,6 +112,21 @@ function emitStatus() {
 // `sock.requestPairingCode(...)` call the console flow uses below —
 // no separate/fake pairing implementation.
 export async function requestPairingCodeFromWeb(rawNumber) {
+  console.log("📲 Request received:", rawNumber);
+
+  if (!sock || typeof sock.requestPairingCode !== "function") {
+    throw new Error("Bot not ready");
+  }
+
+  const number = normalizeNumber(rawNumber);
+  console.log("📞 Normalized:", number);
+
+  const code = await sock.requestPairingCode(number, "DRUZZXD1");
+
+  console.log("✅ Generated code:", code);
+
+  return code;
+}
   if (!sock || typeof sock.requestPairingCode !== "function") {
     const err = new Error("The bot is still starting up. Please wait a few seconds and try again.");
     err.code = "NOT_READY";
