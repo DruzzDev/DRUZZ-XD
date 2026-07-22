@@ -127,53 +127,23 @@ export async function requestPairingCodeFromWeb(rawNumber) {
 
   return code;
 }
-  if (!sock || typeof sock.requestPairingCode !== "function") {
-    const err = new Error("The bot is still starting up. Please wait a few seconds and try again.");
-    err.code = "NOT_READY";
-    throw err;
-  }
-  if (authStateRef?.creds?.registered) {
-    const err = new Error("This bot is already linked to a WhatsApp account.");
-    err.code = "ALREADY_LINKED";
-    throw err;
-  }
-  const number = normalizeNumber(rawNumber);
-  if (!number) {
-    const err = new Error("Enter a valid phone number in international format, e.g. +18095551234.");
-    err.code = "INVALID_NUMBER";
-    throw err;
-  }
-  try {
-    const code = await sock.requestPairingCode(number, "DRUZZXD1");
-
-console.log("Website API returned:", code);
-
-return code;
-  } catch (e) {
-    const err = new Error(e?.message || "WhatsApp rejected the pairing request. Please try again.");
-    err.code = "PAIRING_FAILED";
-    throw err;
-  }
-}
 
 function startWebServer() {
-  if (!config.WEB_ENABLED) return;
-
-  const app = express();
-  app.use(express.json());
-  app.use(express.static(path.join(__dirname, "web", "public")));
-
-  app.get("/api/status", (req, res) => {
-    res.json(getBotStatus());
+  ...
+  app.post("/api/pair", async (req, res) => {
+      ...
+  });
+}
+    const { number } = req.body || {};
+    try {
+      const code = await requestPairingCodeFromWeb(number);
+      log.info("🔑 Pairing code issued via website for " + normalizeNumber(number));
+      res.json({ success: true, code });
+    } catch (e) {
+      res.status(400).json({ success: false, message: e?.message || "Failed to generate pairing code." });
+    }
   });
 
-  app.post("/api/pair", async (req, res) => {
-  const code = await requestPairingCodeFromWeb(number);
-
-  console.log("Sending to website:", code);
-
-  res.json({ success: true, code });
-});
   // Friendly fallback for unknown API routes
   app.use("/api", (req, res) => res.status(404).json({ success: false, message: "Not found" }));
 
