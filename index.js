@@ -130,7 +130,10 @@ export async function requestPairingCodeFromWeb(rawNumber) {
   }
   try {
     const code = await sock.requestPairingCode(number, "DRUZZXD1");
-    return code;
+
+console.log("Website API returned:", code);
+
+return code;
   } catch (e) {
     const err = new Error(e?.message || "WhatsApp rejected the pairing request. Please try again.");
     err.code = "PAIRING_FAILED";
