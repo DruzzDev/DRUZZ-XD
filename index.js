@@ -153,16 +153,12 @@ function startWebServer() {
   });
 
   app.post("/api/pair", async (req, res) => {
-    const { number } = req.body || {};
-    try {
-      const code = await requestPairingCodeFromWeb(number);
-      log.info("🔑 Pairing code issued via website for " + normalizeNumber(number));
-      res.json({ success: true, code });
-    } catch (e) {
-      res.status(400).json({ success: false, message: e?.message || "Failed to generate pairing code." });
-    }
-  });
+  const code = await requestPairingCodeFromWeb(number);
 
+  console.log("Sending to website:", code);
+
+  res.json({ success: true, code });
+});
   // Friendly fallback for unknown API routes
   app.use("/api", (req, res) => res.status(404).json({ success: false, message: "Not found" }));
 
